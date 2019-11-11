@@ -6,7 +6,6 @@ module.exports = app => {
 
     // ctx.socket.on("success", info => {
     //   // ctx.socket.send("socket连接成功!");
-
     // });
     // let id = info.id;
 
@@ -15,8 +14,6 @@ module.exports = app => {
       // const token = info.token;
       ctx.service.io.findUser(info.name).then(res => {
         console.log(res);
-        const now = md5(info.name + parseInt(new Date().getTime()));
-        const limit = (res[0] && res[0].limit) || "";
         const data = {
           name: info.name,
           password: info.password,
@@ -27,7 +24,6 @@ module.exports = app => {
             info.name + parseInt(new Date().getTime() / 1000 + 60 * 60)
           )
         };
-        console.log(now, limit);
         if (!res.length) {
           ctx.service.io.inserUser(data).then(res => {
             ctx.socket.send({
@@ -40,8 +36,6 @@ module.exports = app => {
             //   nsp.to("room").send(`欢迎${info.name}加入！`);
             // });
           });
-        } else if (now == limit) {
-          ctx.socket.disconnect();
         } else if (
           info.name != res[0].name ||
           info.password != res[0].password
@@ -75,6 +69,19 @@ module.exports = app => {
         }
       });
     });
+
+    // ctx.socket.on("token", info => {
+    //   ctx.service.io.findUser(info.name).then(res => {
+    //     console.log("testtoken", res);
+    //     const now = md5(info.name + parseInt(new Date().getTime()));
+    //     console.log(now);
+    //     // const now = 'a78e1e3a6988ff558628f5ad2bd26297';
+    //     const limit = (res[0] && res[0].limit) || "";
+    //     if (now == limit) {
+    //       ctx.socket.disconnect();
+    //     }
+    //   });
+    // });
 
     ctx.socket.on("online", info => {
       console.log("online", info);
@@ -169,7 +176,7 @@ module.exports = app => {
         });
       });
     });
-    await next();
+    // await next();
     // execute when disconnect.
     console.log("disconnection!");
   };
